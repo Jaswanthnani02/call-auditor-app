@@ -1,42 +1,57 @@
-# 🎧 AI Call Quality Auditor
+# AI Call Quality Auditor
 
-This application acts as an automated Quality Assurance (QA) specialist for customer service calls. It uses Google's advanced **Gemini 2.5 AI** models to analyze conversation dynamics, detect compliance issues, and evaluate agent performance.
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)
+![Gemini](https://img.shields.io/badge/Google_Gemini-multimodal-8E75B2?style=flat-square&logo=googlegemini&logoColor=white)
 
-## 🚀 How It Works
+An automated QA reviewer for customer-service calls. Paste a transcript or upload a recording, and the app returns a pass or fail verdict, the customer's sentiment, the top concerns and the exact lines that support each concern.
 
-### 1. **Input Processing**
-You can provide data in two ways:
-*   **Text Transcript**: Paste a raw transcript of the conversation (Agent vs. Customer).
-*   **Audio File**: Upload an audio recording (`.mp3`, `.wav`, etc.). The app sends the audio file directly to Gemini's multimodal API, which "listens" to the call without needing a separate transcription step.
+## Why
 
-### 2. **AI Analysis**
-Once you click **Analyze Call**, the app sends the data to the **Google Gemini API** with a strictly engineered prompt. The AI is instructed to look for:
-*   ❌ Rude or unprofessional behavior
-*   😤 Customer frustration markers
-*   ⚠️ Escalation triggers (requests for a manager, threats to cancel)
-*   📜 Policy & compliance violations
-*   🤥 Misinformation
-*   ⚖️ Legal risks
+Contact centers usually review a small random sample of calls by hand, so most compliance problems and escalations go unseen. This app reviews every call against the same criteria in seconds and shows its evidence, so a supervisor can check the verdict instead of trusting it blindly.
 
-### 3. **Smart Fallback System**
-The app is built for reliability. It automatically tries the best available model for your API key, cycling through:
-1.  `gemini-2.5-flash` (Fastest & Newest)
-2.  `gemini-2.0-flash`
-3.  `gemini-1.5-flash`
+## How it works
 
-### 4. **Structured Output**
-The AI returns a structured JSON response containing:
-*   **Pass/Fail Status**: An overall verdict on the call quality.
-*   **Sentiment**: The prevailing mood (Positive, Neutral, Negative).
-*   **Top Concerns**: A bulleted list of any critical issues found.
-*   **Evidence**: Direct quotes or timestamps from the call to support its findings.
+```mermaid
+flowchart LR
+    T[Transcript<br/>pasted text] --> P
+    A[Audio file<br/>MP3, WAV, M4A, OGG] --> U[Upload to Gemini<br/>File API] --> P
+    P[Audit prompt<br/>seven risk criteria] --> G[Gemini<br/>structured JSON output]
+    G --> R[Result card<br/>verdict, sentiment,<br/>concerns, evidence]
+```
 
-## 🛠️ Tech Stack
-*   **Frontend**: [Streamlit](https://streamlit.io/) (Python-based web UI)
-*   **Backend Intelligence**: [Google Gemini API](https://ai.google.dev/)
-*   **Dependency Management**: `uv` (Fast Python package installer)
+1. **Input.** Either a text transcript or an audio recording. Audio goes straight to Gemini's multimodal API, so there is no separate speech-to-text step.
+2. **Audit.** The model checks the call for rude or unprofessional agent behavior, customer frustration, escalation triggers, policy or compliance violations, misinformation, safety or legal risks, and repeated unresolved issues.
+3. **Structured output.** The response is constrained to a typed schema, so the UI never has to parse free text:
 
-## 🔑 Setup
-1.  Get an API Key from [Google AI Studio](https://aistudio.google.com/).
-2.  Add it to a `.env` file (`API_KEY=your_key`) or enter it in the sidebar.
-3.  Run with `uv run streamlit run app.py`.
+| Field | Meaning |
+|---|---|
+| `pass_fail` | Overall verdict for the call |
+| `sentiment` | Customer sentiment |
+| `top_concerns` | The most serious issues found |
+| `evidence` | Quotes from the call that back each concern |
+
+## Run it locally
+
+```bash
+git clone https://github.com/Jaswanthnani02/call-auditor-app.git
+cd call-auditor-app
+pip install -r requirements.txt
+cp .env.example .env    # then add your Gemini API key
+streamlit run app.py
+```
+
+If no key is set in `.env`, the app asks for one in the sidebar. Keys entered there are used for that session only.
+
+## Project structure
+
+| File | Purpose |
+|---|---|
+| `app.py` | Streamlit UI: input tabs, analysis trigger, result display |
+| `analyzer.py` | Gemini integration: file upload, prompt, typed response schema |
+| `list_models.py` | Lists the Gemini models available to your key |
+| `deployment_guide.md` | Steps for deploying to Streamlit Community Cloud |
+
+## Stack
+
+Python, Streamlit, Google Gemini (multimodal, structured output), python-dotenv.
