@@ -1,6 +1,6 @@
 # AI Call Quality Auditor
 
-![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.13+-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)
 ![Gemini](https://img.shields.io/badge/Google_Gemini-multimodal-8E75B2?style=flat-square&logo=googlegemini&logoColor=white)
 
@@ -15,14 +15,14 @@ Contact centers usually review a small random sample of calls by hand, so most c
 ```mermaid
 flowchart LR
     T[Transcript<br/>pasted text] --> P
-    A[Audio file<br/>MP3, WAV, M4A, OGG] --> U[Upload to Gemini<br/>File API] --> P
-    P[Audit prompt<br/>seven risk criteria] --> G[Gemini<br/>structured JSON output]
+    A[Audio file<br/>MP3 recommended] --> U[Upload to Gemini<br/>File API] --> P
+    P[Audit prompt<br/>seven risk criteria] --> G[Gemini<br/>JSON response]
     G --> R[Result card<br/>verdict, sentiment,<br/>concerns, evidence]
 ```
 
 1. **Input.** Either a text transcript or an audio recording. Audio goes straight to Gemini's multimodal API, so there is no separate speech-to-text step.
 2. **Audit.** The model checks the call for rude or unprofessional agent behavior, customer frustration, escalation triggers, policy or compliance violations, misinformation, safety or legal risks, and repeated unresolved issues.
-3. **Structured output.** The response is constrained to a typed schema, so the UI never has to parse free text:
+3. **JSON output.** The model is asked to answer in JSON with these fields, and the app parses it into a result card:
 
 | Field | Meaning |
 |---|---|
